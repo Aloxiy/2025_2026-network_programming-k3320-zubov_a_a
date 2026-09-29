@@ -1,6 +1,7 @@
 
 # Лабораторная работа №2
 ## Развертывание дополнительного CHR, первый сценарий Ansible
+<https://ex-itmo-ict-faculty.github.io/network-programming/education/labs2023_2024/lab1/lab1/>
 
 **Студент:** Алексей Зубов  
 **Логин:** `aloxiy`
