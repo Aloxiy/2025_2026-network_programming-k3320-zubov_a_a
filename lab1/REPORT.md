@@ -21,13 +21,6 @@ sudo apt install wireguard
 sudo apt install iptables-persistent
 ```
 
-Настройка FireWall:
-
-```bash
-sudo iptables -I INPUT -p udp --dport 51820 -j ACCEPT
-sudo netfilter-persistent save
-```
-
 Генерация ключей:
 
 ```bash
@@ -37,62 +30,22 @@ wg genkey | tee client_private.key | wg pubkey > client_public.key
 
 Настройка /etc/wireguard/wg0.conf
 
-```conf
-[Interface]
-Address = 10.0.0.1/24
-ListenPort = 51820
-PrivateKey = <SERVER_PRIVATE_KEY>
+![/etc/wireguard/wg0.conf](images/Screenshot_8.png)
 
-PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERAD
-
-[Peer]
-PublicKey = <CLIENT_PRIVATE_KEY>
-AllowedIPs = 10.0.0.2/32
-```
 
 Запуск сервера:
 
-```bash
-sudo systemctl start wg-quick@wg0
-sudo systemctl enable wg-quick@wg0
-sudo wg
-interface: wg0
-  public key: dSQvwLS5eFlOcwkgi+KSFbzJ/S3Dqd3psZAc84LYZHU=
-  private key: (hidden)
-  listening port: 51820
-
-peer: 44Y6pS8XLDzvYOOxFjCFrEiFu6HArwvDk8raxYS1ARs=
-  endpoint: 45.135.165.126:46439
-  allowed ips: 10.0.0.2/32
-```
+![Server_wg0_start](images/Screenshot_9.png)
 
 ### VPN-клиент
 
-```routeros
-/interface wireguard add name=wg0 private-key="<CLIENT_PRIVATE_KEY>"
-/ip address add address=10.0.0.2/24 interface=wg0
-
-/interface wireguard peers add \
-    interface=wg0 \
-    public-key="<SERVER_PUBLIC_KEY>" \
-    endpoint-address=<SERVER_IP> \
-    endpoint-port=51820 \
-    allowed-address=0.0.0.0/0 \
-    persistent-keepalive=25
-
-/ip firewall nat add chain=srcnat out-interface=wg0 action=masquerade
-```
+![Server_wg0_start](images/Screenshot_10.png)
 
 ### Тест
 
-Ping с сервера на роутер:
+Ping с сервера на роутер и наоборот:
 
 ![Ping](images/server-router-ping.png)
-
-Ping с роутера на сервер:
-
-![Ping](images/router-server-ping.png)
 
 ## Заключение
 
