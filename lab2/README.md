@@ -473,25 +473,7 @@ CHR1 ←→ CHR2
 
 Для этого использовался playbook `config_collect.yml`.
 
-```yaml
----
-- name: Collect full RouterOS configuration
-  hosts: routers
-  gather_facts: false
-
-  tasks:
-
-    - name: Export full configuration
-      community.routeros.command:
-        commands:
-          - /export
-      register: config
-
-    - name: Save configuration to local file
-      ansible.builtin.copy:
-        content: "{{ config.stdout[0] }}"
-        dest: "configs/{{ inventory_hostname }}.rsc"
-```
+![config_collect.yml](images/Screenshot_7.png)
 
 После выполнения были получены файлы:
 
@@ -583,7 +565,7 @@ Role:
 
 # 22. Финальная проверка
 
-Для окончательной проверки был создан `final_check.yml`.
+Для окончательной проверки был создан [final_check.yml](ansible/final_check.yml).
 
 Он позволяет одним запуском получить:
 
