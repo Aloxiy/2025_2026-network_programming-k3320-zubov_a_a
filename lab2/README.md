@@ -123,7 +123,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 CHR1 → Ubuntu
 CHR2 → Ubuntu
 ```
-![Server_WG](images/Screenshot_2.png)
+![Server_Ping](images/Screenshot_2.png)
 
 После включения IP forwarding и настройки `allowed-address` была проверена связь непосредственно между CHR:
 
@@ -134,7 +134,7 @@ CHR2 → CHR1
 
 Связь успешно установилась.
 
-![Server_WG](images/Screenshot_3.png)
+![Routers_Ping](images/Screenshot_3.png)
 
 Это позволило использовать сеть `10.100.100.0/24` для дальнейшей настройки OSPF.
 
@@ -168,18 +168,7 @@ community.routeros
 
 Для Ansible был создан файл `inventory.ini`.
 
-```ini
-[routers]
-chr1 ansible_host=10.100.100.2
-chr2 ansible_host=10.100.100.3
-
-[routers:vars]
-ansible_connection=ansible.netcommon.network_cli
-ansible_network_os=community.routeros.routeros
-ansible_user=ansible
-ansible_password=USER_PASSWORD
-ansible_ssh_common_args='-o StrictHostKeyChecking=no'
-```
+![inventory.ini](images/Screenshot_4.png)
 
 Таким образом, Ansible знает адреса обоих маршрутизаторов:
 
@@ -193,6 +182,8 @@ CHR2 → 10.100.100.3
 # 8. Проверка подключения через Ansible
 
 Для проверки подключения был создан playbook `test.yml`.
+
+![test.yml](images/Screenshot_5.png)
 
 ```yaml
 ---
