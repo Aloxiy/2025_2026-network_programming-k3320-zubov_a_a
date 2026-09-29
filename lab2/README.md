@@ -123,6 +123,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 CHR1 → Ubuntu
 CHR2 → Ubuntu
 ```
+![Server_WG](images/Screenshot_2.png)
 
 После включения IP forwarding и настройки `allowed-address` была проверена связь непосредственно между CHR:
 
@@ -132,6 +133,8 @@ CHR2 → CHR1
 ```
 
 Связь успешно установилась.
+
+![Server_WG](images/Screenshot_3.png)
 
 Это позволило использовать сеть `10.100.100.0/24` для дальнейшей настройки OSPF.
 
