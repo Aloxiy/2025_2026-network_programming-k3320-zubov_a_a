@@ -475,15 +475,7 @@ CHR1 ←→ CHR2
 
 ![config_collect.yml](images/Screenshot_7.png)
 
-После выполнения были получены файлы:
-
-```text
-configs/
-├── chr1.rsc
-└── chr2.rsc
-```
-
-В этих файлах сохранена конфигурация соответствующих маршрутизаторов.
+После выполнения были получены файлы [chr1.rsc](routers/chr1.rsc) и [chr2.rsc](routers/chr2.rsc):
 
 ---
 
