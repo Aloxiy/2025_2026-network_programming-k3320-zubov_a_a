@@ -213,42 +213,7 @@ Ansible успешно подключился к обоим маршрутиза
 
 ---
 
-# 9. Создание пользователя Ansible
-
-Для автоматического управления маршрутизаторами был создан отдельный пользователь:
-
-```text
-ansible
-```
-
-Пользователь получил группу:
-
-```text
-full
-```
-
-Для создания пользователя использовался playbook `user.yml`:
-
-```yaml
----
-- name: Configure Ansible user on RouterOS devices
-  hosts: routers
-  gather_facts: false
-
-  tasks:
-    - name: Create Ansible user
-      community.routeros.command:
-        commands:
-          - /user add name=ansible group=full password=USER_PASSWORD
-```
-
-После выполнения на обоих маршрутизаторах появился пользователь `ansible`.
-
-Пароль в GitHub-репозитории не хранится.
-
----
-
-# 10. Настройка NTP
+# 9. Настройка NTP
 
 Следующим этапом была настроена синхронизация времени.
 
@@ -263,34 +228,13 @@ time.cloudflare.com
 
 Playbook:
 
-```yaml
----
-- name: Configure NTP on RouterOS devices
-  hosts: routers
-  gather_facts: false
-
-  tasks:
-    - name: Enable NTP client
-      community.routeros.command:
-        commands:
-          - /system ntp client set enabled=yes
-
-    - name: Add NTP server pool.ntp.org
-      community.routeros.command:
-        commands:
-          - /system ntp client servers add address=pool.ntp.org
-
-    - name: Add NTP server time.cloudflare.com
-      community.routeros.command:
-        commands:
-          - /system ntp client servers add address=time.cloudflare.com
-```
+![ntp.yml](images/Screenshot_6.png)
 
 После настройки NTP-клиент на обоих устройствах был включён.
 
 ---
 
-# 11. Настройка OSPF
+# 10. Настройка OSPF
 
 После того как WireGuard и Ansible были настроены, следующим этапом стала настройка динамической маршрутизации OSPF.
 
@@ -305,7 +249,7 @@ Playbook:
 
 ---
 
-# 12. Создание OSPF instance
+# 11. Создание OSPF instance
 
 На CHR1:
 
@@ -328,7 +272,7 @@ CHR2 → Router ID 2.2.2.2
 
 ---
 
-# 13. Создание OSPF Area
+# 12. Создание OSPF Area
 
 Для обоих маршрутизаторов была создана backbone area:
 
@@ -347,7 +291,7 @@ Area ID: 0.0.0.0
 
 ---
 
-# 14. Добавление WireGuard-сети в OSPF
+# 13. Добавление WireGuard-сети в OSPF
 
 В OSPF была добавлена сеть:
 
@@ -367,7 +311,7 @@ Area ID: 0.0.0.0
 
 ---
 
-# 15. Настройка типа OSPF-сети
+# 14. Настройка типа OSPF-сети
 
 Сначала интерфейс WireGuard был настроен как `point-to-point`.
 
@@ -401,7 +345,7 @@ NBMA
 
 ---
 
-# 16. Проверка OSPF-соседей
+# 15. Проверка OSPF-соседей
 
 Для проверки использовалась команда:
 
@@ -435,7 +379,7 @@ Full
 
 ---
 
-# 17. DR и BDR
+# 16. DR и BDR
 
 После установления OSPF-соседства были определены DR и BDR.
 
@@ -460,7 +404,7 @@ CHR2 → state=dr
 
 ---
 
-# 18. Проверка связности
+# 17. Проверка связности
 
 После настройки OSPF была выполнена проверка ping.
 
@@ -492,7 +436,7 @@ avg-rtt=38.378 ms
 
 ---
 
-# 19. Сбор информации о топологии
+# 18. Сбор информации о топологии
 
 Для получения информации о состоянии OSPF был создан playbook `ospf_topology.yml`.
 
@@ -521,7 +465,7 @@ CHR1 ←→ CHR2
 
 ---
 
-# 20. Получение конфигураций
+# 19. Получение конфигураций
 
 После завершения настройки была получена полная конфигурация обоих маршрутизаторов.
 
@@ -559,7 +503,7 @@ configs/
 
 ---
 
-# 21. Итоговая схема
+# 20. Итоговая схема
 
 Итоговая схема лабораторной работы:
 
@@ -583,7 +527,7 @@ configs/
 
 ---
 
-# 22. Итоговая конфигурация
+# 21. Итоговая конфигурация
 
 ### CHR1
 
@@ -635,7 +579,7 @@ Role:
 
 ---
 
-# 23. Финальная проверка
+# 22. Финальная проверка
 
 Для окончательной проверки был создан `final_check.yml`.
 
@@ -657,7 +601,7 @@ ansible-playbook final_check.yml
 
 ---
 
-# 24. Результаты работы
+# 23. Результаты работы
 
 В результате выполнения лабораторной работы:
 
@@ -684,7 +628,7 @@ ansible-playbook final_check.yml
 
 ---
 
-# 25. Вывод
+# 24. Вывод
 
 В ходе лабораторной работы был развернут второй виртуальный маршрутизатор MikroTik CHR и организовано его подключение к существующей инфраструктуре с помощью WireGuard.
 
