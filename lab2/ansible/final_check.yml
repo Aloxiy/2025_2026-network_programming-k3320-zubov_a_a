@@ -1,0 +1,95 @@
+- name: Final verification of RouterOS CHR configuration
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+
+    - name: Get router identity
+      community.routeros.command:
+        commands:
+          - /system identity print
+      register: identity
+
+    - name: Get system resources
+      community.routeros.command:
+        commands:
+          - /system resource print
+      register: resources
+
+    - name: Get IP addresses
+      community.routeros.command:
+        commands:
+          - /ip address print detail
+      register: addresses
+
+    - name: Get routing table
+      community.routeros.command:
+        commands:
+          - /ip route print
+      register: routes
+
+    - name: Get NTP configuration
+      community.routeros.command:
+        commands:
+          - /system ntp client print
+          - /system ntp client servers print
+      register: ntp
+
+    - name: Get OSPF instances
+      community.routeros.command:
+        commands:
+          - /routing ospf instance print detail
+      register: ospf_instances
+
+    - name: Get OSPF areas
+      community.routeros.command:
+        commands:
+          - /routing ospf area print detail
+      register: ospf_areas
+
+    - name: Get OSPF interfaces
+      community.routeros.command:
+        commands:
+          - /routing ospf interface print detail
+      register: ospf_interfaces
+
+    - name: Get OSPF neighbors
+      community.routeros.command:
+        commands:
+          - /routing ospf neighbor print detail
+      register: ospf_neighbors
+
+    - name: Check connectivity with the opposite CHR
+      community.routeros.command:
+        commands:
+          - >-
+            /ping
+            {{ '10.100.100.3' if inventory_hostname == 'chr1'
+               else '10.100.100.2' }}
+            count=4
+      register: connectivity
+
+    - name: Display final verification results
+      ansible.builtin.debug:
+        msg:
+          - "===== {{ inventory_hostname }} ====="
+          - "IDENTITY:"
+          - "{{ identity.stdout }}"
+          - "SYSTEM RESOURCES:"
+          - "{{ resources.stdout }}"
+          - "IP ADDRESSES:"
+          - "{{ addresses.stdout }}"
+          - "ROUTING TABLE:"
+          - "{{ routes.stdout }}"
+          - "NTP:"
+          - "{{ ntp.stdout }}"
+          - "OSPF INSTANCES:"
+          - "{{ ospf_instances.stdout }}"
+          - "OSPF AREAS:"
+          - "{{ ospf_areas.stdout }}"
+          - "OSPF INTERFACES:"
+          - "{{ ospf_interfaces.stdout }}"
+          - "OSPF NEIGHBORS:"
+          - "{{ ospf_neighbors.stdout }}"
+          - "CONNECTIVITY:"
+          - "{{ connectivity.stdout }}"
