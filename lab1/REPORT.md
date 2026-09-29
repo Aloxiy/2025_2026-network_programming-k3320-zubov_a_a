@@ -2,7 +2,7 @@
 
 ## Задание
 
-<https://itmo-ict-faculty.github.io/network-programming/education/labs2023_2024/lab1/lab1/>
+<https://ex-itmo-ict-faculty.github.io/network-programming/education/labs2023_2024/lab1/lab1/>
 
 
 ### VM
