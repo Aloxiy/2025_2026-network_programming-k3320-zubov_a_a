@@ -108,8 +108,8 @@ WireGuard использует порт:
 sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
-![CHR2](images/screenshot_1.png)
-![Server_WG](images/screenshot_2.png)
+![CHR2](images/Screenshot_1.png)
+![Server_WG](images/Screenshot_2.png)
 
 ---
 
