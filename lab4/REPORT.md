@@ -144,7 +144,7 @@ mininet> xterm h1 h2
 
 Результат на `h2`:
 
-![Tunnel H2 with H3 IP](./images/Screenshot_12.png.png)
+![Tunnel H2 with H3 IP](./images/Screenshot_12.png)
 
 Пакет пришел на `h2`, хотя IP-адрес `10.0.3.3` принадлежит `h3`. Это подтверждает, что для инкапсулированных пакетов коммутатор использует поле `dst_id` из заголовка `myTunnel`.
 
