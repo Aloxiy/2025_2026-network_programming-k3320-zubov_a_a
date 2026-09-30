@@ -1,0 +1,110 @@
+---
+- name: Collect CHR information and update NetBox
+  hosts: routers
+  gather_facts: false
+
+  vars:
+    netbox_url: "http://10.129.0.22:8000"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+
+  tasks:
+
+    - name: Get system resource
+      community.routeros.command:
+        commands:
+          - /system resource print
+      register: system_resource
+
+    - name: Get system license
+      community.routeros.command:
+        commands:
+          - /system license print
+      register: system_license
+
+    - name: Get interface information
+      community.routeros.command:
+        commands:
+          - /interface print detail
+      register: interfaces
+
+    - name: Parse system resource
+      ansible.builtin.set_fact:
+        routeros_version: "{{ system_resource.stdout[0] | regex_search('version:\\s+([^\\s]+)', '\\1') | first }}"
+        cpu: "{{ system_resource.stdout[0] | regex_search('cpu:\\s+(.+?)\\s{2,}', '\\1') | first }}"
+        cpu_count: "{{ system_resource.stdout[0] | regex_search('cpu-count:\\s+(\\d+)', '\\1') | first | int }}"
+        cpu_frequency_mhz: "{{ system_resource.stdout[0] | regex_search('cpu-frequency:\\s+(\\d+)MHz', '\\1') | first | int }}"
+        total_memory_mb: "{{ system_resource.stdout[0] | regex_search('total-memory:\\s+([0-9.]+)MiB', '\\1') | first | float | round(0) | int }}"
+        free_memory_mb: "{{ system_resource.stdout[0] | regex_search('free-memory:\\s+([0-9.]+)MiB', '\\1') | first | float | round(0) | int }}"
+        total_disk_mb: "{{ system_resource.stdout[0] | regex_search('total-hdd-space:\\s+([0-9.]+)MiB', '\\1') | first | float | round(0) | int }}"
+        free_disk_mb: "{{ system_resource.stdout[0] | regex_search('free-hdd-space:\\s+([0-9.]+)MiB', '\\1') | first | float | round(0) | int }}"
+        architecture: "{{ system_resource.stdout[0] | regex_search('architecture-name:\\s+(\\S+)', '\\1') | first }}"
+        board_name: "{{ system_resource.stdout[0] | regex_search('board-name:\\s+(.+?)\\s{2,}', '\\1') | first }}"
+
+    - name: Parse license information
+      ansible.builtin.set_fact:
+        routeros_system_id: "{{ system_license.stdout[0] | regex_search('system-id:\\s+(\\S+)', '\\1') | first }}"
+        license_level: "{{ system_license.stdout[0] | regex_search('level:\\s+(\\S+)', '\\1') | first }}"
+
+    - name: Parse ether1 MAC address
+      ansible.builtin.set_fact:
+        ether1_mac: >-
+          {{
+            interfaces.stdout[0]
+            | regex_findall('mac-address=([0-9A-Fa-f:]+)')
+            | first
+          }}
+
+    - name: Build NetBox custom fields with correct types
+      ansible.builtin.set_fact:
+        netbox_custom_fields:
+          routeros_version: "{{ routeros_version }}"
+          architecture: "{{ architecture }}"
+          cpu: "{{ cpu }}"
+          cpu_count: "{{ (cpu_count | int) | string | from_yaml }}"
+          cpu_frequency_mhz: "{{ (cpu_frequency_mhz | int) | string | from_yaml }}"
+          total_memory_mb: "{{ (total_memory_mb | int) | string | from_yaml }}"
+          free_memory_mb: "{{ (free_memory_mb | int) | string | from_yaml }}"
+          total_disk_mb: "{{ (total_disk_mb | int) | string | from_yaml }}"
+          free_disk_mb: "{{ (free_disk_mb | int) | string | from_yaml }}"
+          board_name: "{{ board_name }}"
+          license_level: "{{ license_level }}"
+          routeros_system_id: "{{ routeros_system_id }}"
+          ether1_mac: "{{ ether1_mac }}"
+
+    - name: Check custom field types
+      ansible.builtin.debug:
+        msg:
+          cpu_count_type: "{{ netbox_custom_fields.cpu_count | type_debug }}"
+          cpu_frequency_type: "{{ netbox_custom_fields.cpu_frequency_mhz | type_debug }}"
+          total_memory_type: "{{ netbox_custom_fields.total_memory_mb | type_debug }}"
+          free_memory_type: "{{ netbox_custom_fields.free_memory_mb | type_debug }}"
+          total_disk_type: "{{ netbox_custom_fields.total_disk_mb | type_debug }}"
+          free_disk_type: "{{ netbox_custom_fields.free_disk_mb | type_debug }}"
+
+    - name: Show parsed values
+      ansible.builtin.debug:
+        msg:
+          device: "{{ inventory_hostname }}"
+          routeros_version: "{{ routeros_version }}"
+          architecture: "{{ architecture }}"
+          cpu: "{{ cpu }}"
+          cpu_count: "{{ cpu_count }}"
+          cpu_frequency_mhz: "{{ cpu_frequency_mhz }}"
+          total_memory_mb: "{{ total_memory_mb }}"
+          free_memory_mb: "{{ free_memory_mb }}"
+          total_disk_mb: "{{ total_disk_mb }}"
+          free_disk_mb: "{{ free_disk_mb }}"
+          board_name: "{{ board_name }}"
+          license_level: "{{ license_level }}"
+          routeros_system_id: "{{ routeros_system_id }}"
+          ether1_mac: "{{ ether1_mac }}"
+
+    - name: Update device information in NetBox
+      netbox.netbox.netbox_device:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "{{ inventory_hostname }}"
+          custom_fields: "{{ netbox_custom_fields }}"
+        state: present
+      delegate_to: localhost
