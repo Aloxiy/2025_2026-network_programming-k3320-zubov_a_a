@@ -65,6 +65,9 @@ make run
 make stop
 make clean
 ```
+Граф обработки пакета в Basic Forwarding
+
+![Граф обработки пакета в Basic Forwarding](images/1.drawio.png)
 
 ### Basic Tunneling
 
@@ -154,6 +157,11 @@ mininet> xterm h1 h2
 make stop
 make clean
 ```
+
+Граф работы Basic Tunnel
+
+![Граф работы Basic Tunnel](images/2.drawio.png)
+
 
 ## Заключение
 
