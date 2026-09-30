@@ -71,20 +71,13 @@ CHR2     10.100.100.3/24
        CHR1              CHR2
 ```
 
+![Link Scheme 1](images/Draw3.png)
+
 Ansible Controller располагается на `lab11` и используется для управления обоими CHR.
 
 Взаимодействие имеет два основных направления:
 
-```text
-                    NetBox
-                  ↕        ↕
-              REST API      |
-                  ↕          |
-               Ansible      |
-                /   \       |
-               ↓     ↓      |
-             CHR1   CHR2 <---+
-```
+![Link Scheme 2](images/Draw4.png)
 
 NetBox используется как централизованный источник информации об устройствах.
 
