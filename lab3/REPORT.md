@@ -54,7 +54,7 @@ CHR2     10.100.100.3/24
 
 Общая логическая схема инфраструктуры:
 
-![Link Scheme 1](images/Draw3.png)
+![Link Scheme 1](images/Draw33.png)
 
 Ansible Controller располагается на `lab11` и используется для управления обоими CHR.
 
