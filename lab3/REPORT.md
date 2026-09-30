@@ -559,7 +559,7 @@ lab2/
 
 | Файл                             | Назначение                                    |
 | -------------------------------- | --------------------------------------------- |
-| `[netbox_base.yml](./playbooks/netbox_base.yml)`                | Создание базовой структуры NetBox             |
+| [`netbox_base.yml`](./playbooks/netbox_base.yml)                | Создание базовой структуры NetBox             |
 | `netbox_custom_fields.yml`       | Создание custom fields                        |
 | `collect_chr_info.yml`           | Сбор информации с CHR и запись в NetBox       |
 | `export_netbox.yml`              | Экспорт данных NetBox в JSON                  |
