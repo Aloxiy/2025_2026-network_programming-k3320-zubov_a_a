@@ -1,1 +1,85 @@
+---
+- name: Configure CHRs from NetBox
+  hosts: routers
+  gather_facts: false
 
+  vars:
+    netbox_url: "http://10.129.0.22:8000"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+
+  tasks:
+
+    - name: Get device data from NetBox
+      ansible.builtin.shell: |
+        python3 - <<'PY'
+        import json
+        import pynetbox
+
+        nb = pynetbox.api(
+            "{{ netbox_url }}",
+            token="{{ netbox_token }}"
+        )
+
+        devices = list(
+            nb.dcim.devices.filter(name="{{ inventory_hostname }}")
+        )
+
+        if not devices:
+            raise SystemExit(
+                "Device {{ inventory_hostname }} not found in NetBox"
+            )
+
+        device = devices[0]
+
+        result = {
+            "name": device.name,
+            "primary_ip": (
+                device.primary_ip.address
+                if device.primary_ip
+                else None
+            )
+        }
+
+        print(json.dumps(result))
+        PY
+      register: netbox_data_raw
+      changed_when: false
+      no_log: true
+      check_mode: false
+      delegate_to: localhost
+
+    - name: Parse NetBox data
+      ansible.builtin.set_fact:
+        netbox_data: "{{ netbox_data_raw.stdout | from_json }}"
+
+    - name: Show data received from NetBox
+      ansible.builtin.debug:
+        msg:
+          device: "{{ netbox_data.name }}"
+          primary_ip: "{{ netbox_data.primary_ip }}"
+
+    - name: Get current router identity
+      community.routeros.command:
+        commands:
+          - /system identity print
+      register: current_identity
+
+    - name: Get current IP addresses
+      community.routeros.command:
+        commands:
+          - /ip address print detail
+      register: current_addresses
+
+    - name: Set router identity from NetBox
+      community.routeros.command:
+        commands:
+          - /system identity set name={{ netbox_data.name }}
+      when: netbox_data.name not in current_identity.stdout[0]
+
+    - name: Add primary IP from NetBox to wg0
+      community.routeros.command:
+        commands:
+          - /ip address add address={{ netbox_data.primary_ip }} interface=wg0
+      when:
+        - netbox_data.primary_ip is not none
+        - netbox_data.primary_ip not in current_addresses.stdout[0]
