@@ -1,0 +1,180 @@
+---
+- name: Create basic NetBox objects
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    netbox_url: "http://10.129.0.22:8000"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+
+  tasks:
+
+    - name: Create site
+      netbox.netbox.netbox_site:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "Yandex Cloud"
+          slug: "yandex-cloud"
+        state: present
+
+    - name: Create manufacturer
+      netbox.netbox.netbox_manufacturer:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "MikroTik"
+          slug: "mikrotik"
+        state: present
+
+    - name: Create device role
+      netbox.netbox.netbox_device_role:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "Router"
+          slug: "router"
+        state: present
+    - name: Create device type
+      netbox.netbox.netbox_device_type:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          manufacturer: "MikroTik"
+          model: "CHR"
+          slug: "mikrotik-chr"
+        state: present
+
+    - name: Create platform
+      netbox.netbox.netbox_platform:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "RouterOS"
+          slug: "routeros"
+        state: present
+    - name: Create CHR1 device
+      netbox.netbox.netbox_device:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "chr1"
+          device_type: "MikroTik CHR"
+          device_role: "Router"
+          site: "Yandex Cloud"
+          platform: "RouterOS"
+          status: "active"
+        state: present
+
+    - name: Create CHR2 device
+      netbox.netbox.netbox_device:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "chr2"
+          device_type: "MikroTik CHR"
+          device_role: "Router"
+          site: "Yandex Cloud"
+          platform: "RouterOS"
+          status: "active"
+        state: present
+    - name: Create CHR1 ether1 interface
+      netbox.netbox.netbox_device_interface:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          device: "chr1"
+          name: "ether1"
+          type: "1000base-t"
+        state: present
+
+    - name: Create CHR1 lo interface
+      netbox.netbox.netbox_device_interface:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          device: "chr1"
+          name: "lo"
+          type: "virtual"
+        state: present
+
+    - name: Create CHR1 wg0 interface
+      netbox.netbox.netbox_device_interface:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          device: "chr1"
+          name: "wg0"
+          type: "virtual"
+        state: present
+
+    - name: Create CHR2 ether1 interface
+      netbox.netbox.netbox_device_interface:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          device: "chr2"
+          name: "ether1"
+          type: "1000base-t"
+        state: present
+
+    - name: Create CHR2 lo interface
+      netbox.netbox.netbox_device_interface:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          device: "chr2"
+          name: "lo"
+          type: "virtual"
+        state: present
+
+    - name: Create CHR2 wg0 interface
+      netbox.netbox.netbox_device_interface:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          device: "chr2"
+          name: "wg0"
+          type: "virtual"
+        state: present
+    - name: Create CHR1 WireGuard IP
+      netbox.netbox.netbox_ip_address:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          address: "10.100.100.2/24"
+          status: "active"
+          assigned_object:
+            name: "wg0"
+            device: "chr1"
+        state: present
+
+    - name: Create CHR2 WireGuard IP
+      netbox.netbox.netbox_ip_address:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          address: "10.100.100.3/24"
+          status: "active"
+          assigned_object:
+            name: "wg0"
+            device: "chr2"
+        state: present
+    - name: Set CHR1 primary IP
+      netbox.netbox.netbox_device:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "chr1"
+          primary_ip4: "10.100.100.2/24"
+        state: present
+
+    - name: Set CHR2 primary IP
+      netbox.netbox.netbox_device:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "chr2"
+          primary_ip4: "10.100.100.3/24"
+        state: present
