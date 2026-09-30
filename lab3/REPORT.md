@@ -94,13 +94,8 @@ NetBox используется как централизованный исто
 
 Для NetBox была создана отдельная виртуальная машина:
 
-```text
-OS: Ubuntu Server 24.04.5 LTS
-CPU: 2 vCPU
-RAM: 2 GiB
-Disk: 19 GiB
-IP: 10.129.0.22/24
-```
+![NetBox VM](images/Screenshot_12.png)
+
 
 На виртуальную машину были установлены Docker и Docker Compose:
 
@@ -132,10 +127,7 @@ services:
 
 После этого контейнеры NetBox были запущены:
 
-```bash
-docker compose pull
-docker compose up -d
-```
+![NetBox Docker](images/Screenshot_3.png)
 
 После завершения миграций приложение перешло в состояние `healthy`.
 
@@ -145,11 +137,11 @@ NetBox был доступен по адресу:
 http://10.129.0.22:8000
 ```
 
-Версия установленного NetBox:
+![NetBox Main](images/Screenshot_2.png)
 
-```text
-4.7.1
-```
+Был создан API Token для подключения
+
+![NetBox VM](images/Screenshot_4.png)
 
 ---
 
@@ -173,19 +165,10 @@ netbox.netbox 3.23.0
 pynetbox 7.0.0
 ```
 
-Проверка версии Ansible:
-
-```text
-Ansible Core 2.16.3
-Python 3.12.3
-```
-
 Для корректной передачи числовых значений custom fields в NetBox был включён native Jinja2:
 
-```ini
-[defaults]
-jinja2_native = True
-```
+![Jinja2_change](images/Screenshot_10.png)
+
 
 ---
 
@@ -204,6 +187,20 @@ jinja2_native = True
 * интерфейсы `ether1`, `lo` и `wg0` для каждого устройства;
 * IP-адреса WireGuard;
 * primary IP для каждого CHR.
+
+Базовая информация про роутеры
+
+![NetBox_Routers](images/Screenshot_6.png)
+
+Добавление интерфейсов
+
+![NetBox_CHR1_int](images/Screenshot_7.png)
+![NetBox_CHR2_int](images/Screenshot_8.png)
+
+Добавление primary IP
+
+![NetBox_primary_IP](images/Screenshot_9.png)
+
 
 В результате NetBox содержит следующую структуру:
 
@@ -245,21 +242,13 @@ Yandex Cloud
 | `routeros_system_id` | text    | System ID RouterOS                     |
 | `ether1_mac`         | text    | MAC-адрес ether1                       |
 
-Для создания этих полей использовался playbook:
-
-```text
-netbox_custom_fields.yml
-```
+Для создания этих полей использовался [netbox_custom_fields.yml](./playbooks/netbox_custom_fields.yml)
 
 ---
 
 # 8. Сбор информации о CHR
 
-Для получения информации с MikroTik был разработан playbook:
-
-```text
-collect_chr_info.yml
-```
+Для получения информации с MikroTik был разработан [collect_chr_info.yml](./playbooks/collect_chr_info.yml)
 
 С помощью модуля:
 
@@ -319,11 +308,8 @@ ether1 MAC:     08:00:27:80:3C:6E
 
 # 9. Экспорт данных NetBox
 
-Для выполнения требования по сохранению данных NetBox был создан playbook:
+Для выполнения требования по сохранению данных NetBox был создан [export_netbox.yml](./playbooks/export_netbox.yml)
 
-```text
-export_netbox.yml
-```
 
 Playbook обращается к NetBox API с использованием `pynetbox` и получает данные следующих объектов:
 
@@ -338,11 +324,7 @@ interfaces
 ip_addresses
 ```
 
-Полученные данные сохраняются в:
-
-```text
-netbox_data.json
-```
+Полученные данные сохраняются в [netbox_data.json](./playbooks/netbox_data.json)
 
 Для проверки использовался режим Ansible Check Mode:
 
@@ -397,11 +379,7 @@ chr2
 
 # 10. Сценарий NetBox → CHR
 
-Для выполнения сценария конфигурации устройств на основании данных NetBox был создан файл:
-
-```text
-scenario_netbox_to_chr.yml
-```
+Для выполнения сценария конфигурации устройств на основании данных NetBox был создан файл [scenario_netbox_to_chr.yml](./playbooks/scenario_netbox_to_chr.yml)
 
 Алгоритм работы:
 
@@ -456,11 +434,7 @@ failed=0
 
 # 11. Сценарий CHR → NetBox
 
-Второй сценарий находится в файле:
-
-```text
-scenario_collect_system_id.yml
-```
+Второй сценарий находится в файле [scenario_collect_system_id.yml](./playbooks/scenario_collect_system_id.yml)
 
 Он выполняет обратную операцию:
 
@@ -560,71 +534,7 @@ routeros_system_id
 
 После завершения настройки была проверена связь между основными компонентами инфраструктуры.
 
-## 13.1. lab11 → NetBox
-
-Команда:
-
-```bash
-ping -c 4 10.129.0.22
-```
-
-Результат:
-
-```text
-4 packets transmitted, 4 received, 0% packet loss
-rtt min/avg/max/mdev = 0.314/0.639/1.397/0.439 ms
-```
-
-Связность между `lab11` и NetBox подтверждена.
-
----
-
-## 13.2. CHR1 → WireGuard hub
-
-Команда:
-
-```bash
-ansible routers -m community.routeros.command \
-  -a '{"commands":["/ping 10.100.100.1 count=4"]}'
-```
-
-Результат для CHR1:
-
-```text
-sent=4 received=4 packet-loss=0%
-avg-rtt=19ms349us
-```
-
----
-
-## 13.3. CHR2 → WireGuard hub
-
-Результат для CHR2:
-
-```text
-sent=4 received=4 packet-loss=0%
-avg-rtt=16ms916us
-```
-
----
-
-## 13.4. CHR2 → CHR1
-
-Для проверки маршрутизации между двумя CHR использовалась команда:
-
-```bash
-ansible routers -m community.routeros.command \
-  -a '{"commands":["/ping 10.100.100.2 count=4"]}'
-```
-
-Результат на CHR2:
-
-```text
-sent=4 received=4 packet-loss=0%
-avg-rtt=37ms182us
-```
-
-Таким образом, связь между CHR1 и CHR2 через центральный WireGuard-узел `lab11` подтверждена.
+![Pings](images/Screenshot_13.png)
 
 ---
 
@@ -678,17 +588,3 @@ lab2/
 11. Оба сценария были дополнительно проверены в обычном режиме.
 12. Была проверена связь между Ansible Controller, NetBox, CHR1 и CHR2.
 13. Была подтверждена маршрутизация между CHR1 и CHR2 через WireGuard hub.
-
----
-
-# 16. Вывод
-
-В ходе лабораторной работы была построена система технического учёта сетевой инфраструктуры на базе NetBox.
-
-NetBox был использован в качестве централизованного источника информации об устройствах, их интерфейсах, IP-адресах и дополнительных параметрах. С помощью Ansible была реализована автоматизация обмена данными между NetBox и MikroTik CHR.
-
-Реализованный сценарий NetBox → CHR позволяет использовать данные системы технического учёта при конфигурации сетевых устройств, а сценарий CHR → NetBox обеспечивает получение актуального идентификатора устройства и сохранение его в централизованной базе.
-
-Проверка в режиме `--check` позволила убедиться в корректности сценариев без внесения соответствующих изменений. Дополнительные реальные запуски подтвердили работоспособность автоматизации.
-
-Таким образом, была реализована схема, в которой **NetBox выступает источником актуальной информации об инфраструктуре, а Ansible обеспечивает автоматизированное взаимодействие между системой учёта и сетевыми устройствами**.
