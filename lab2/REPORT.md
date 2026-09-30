@@ -475,7 +475,7 @@ CHR1 ←→ CHR2
 
 Итоговая схема лабораторной работы:
 
-[Final Link Scheme](./images/Draw2.png)
+![Final Link Scheme](images/Draw2.png)
 
 ---
 
