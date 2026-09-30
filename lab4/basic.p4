@@ -145,12 +145,9 @@ control MyIngress(inout headers hdr,
     }
 
     apply {
-        /* TODO: fix ingress control logic
-         *  - Good practice: apply ipv4_lpm only when the IPv4 header is valid, e.g.:
-         *      if (hdr.ipv4.isValid()) { ipv4_lpm.apply(); }
-         *    This skeleton currently applies unconditionally for the exercise.
-         */
-        ipv4_lpm.apply();
+        if (hdr.ipv4.isValid()) {
+            ipv4_lpm.apply();
+        }
     }
 }
 
