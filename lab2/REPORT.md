@@ -90,16 +90,7 @@ WireGuard использует порт:
 
 Схема соединения:
 
-```text
-                 Ubuntu
-             10.100.100.1
-                  / \
-                 /   \
-                /     \
-               /       \
-             CHR1     CHR2
-        10.100.100.2  10.100.100.3
-```
+![Link Schem](images/Draw1.png)
 
 В данной схеме Ubuntu является центральным узлом WireGuard, через который маршрутизируются пакеты между CHR.
 
@@ -484,23 +475,7 @@ CHR1 ←→ CHR2
 
 Итоговая схема лабораторной работы:
 
-```text
-                         Ubuntu
-                    Ansible + WireGuard
-                       10.100.100.1
-                         /       \
-                        /         \
-                       /           \
-                      /             \
-                 CHR1               CHR2
-            10.100.100.2       10.100.100.3
-             Router ID            Router ID
-              1.1.1.1             2.2.2.2
-                  \                 /
-                   \               /
-                    \--- OSPF ----/
-                         Full
-```
+[Final Link Scheme](./images/Draw2.png)
 
 ---
 
