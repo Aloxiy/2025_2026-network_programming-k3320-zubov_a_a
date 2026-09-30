@@ -1,0 +1,62 @@
+---
+- name: Export NetBox data
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    netbox_url: "http://10.129.0.22:8000"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+    export_file: "{{ playbook_dir }}/netbox_data.json"
+
+  tasks:
+
+    - name: Collect all NetBox data
+      ansible.builtin.shell: |
+        python3 - <<'PY'
+        import json
+        import pynetbox
+
+        nb = pynetbox.api(
+            "{{ netbox_url }}",
+            token="{{ netbox_token }}"
+        )
+
+        def serialize(items):
+            return [item.serialize() for item in items]
+
+        data = {
+            "sites": serialize(nb.dcim.sites.all()),
+            "manufacturers": serialize(nb.dcim.manufacturers.all()),
+            "device_roles": serialize(nb.dcim.device_roles.all()),
+            "device_types": serialize(nb.dcim.device_types.all()),
+            "platforms": serialize(nb.dcim.platforms.all()),
+            "devices": serialize(nb.dcim.devices.all()),
+            "interfaces": serialize(nb.dcim.interfaces.all()),
+            "ip_addresses": serialize(nb.ipam.ip_addresses.all()),
+        }
+
+        print(json.dumps(data, indent=2, ensure_ascii=False))
+        PY
+      register: netbox_export
+      changed_when: false
+      check_mode: false
+      no_log: true
+
+    - name: Save NetBox data to file
+      ansible.builtin.copy:
+        content: "{{ netbox_export.stdout }}"
+        dest: "{{ export_file }}"
+        mode: "0644"
+      check_mode: false
+
+    - name: Show export file information
+      ansible.builtin.stat:
+        path: "{{ export_file }}"
+      register: export_stat
+
+    - name: Show export result
+      ansible.builtin.debug:
+        msg:
+          file: "{{ export_file }}"
+          size_bytes: "{{ export_stat.stat.size }}"
