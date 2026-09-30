@@ -324,7 +324,7 @@ interfaces
 ip_addresses
 ```
 
-Полученные данные сохраняются в [netbox_data.json](./playbooks/netbox_data.json)
+Полученные данные сохраняются в [netbox_data.json](./netbox_data.json)
 
 Для проверки использовался режим Ansible Check Mode:
 
@@ -565,9 +565,9 @@ lab2/
 | [`export_netbox.yml`](./playbooks/export_netbox.yml)              | Экспорт данных NetBox в JSON                  |
 | [`scenario_netbox_to_chr.yml`](./playbooks/scenario_netbox_to_chr.yml)     | Получение данных из NetBox и применение к CHR |
 | [`scenario_collect_system_id.yml`](./playbooks/scenario_collect_system_id.yml) | Сбор system-id с CHR и запись в NetBox        |
-| [`netbox_data.json`](./playbooks/netbox_data.json)               | Результат экспорта NetBox                     |
-| [`inventory.ini`](./playbooks/inventory.ini)                  | Инвентаризация Ansible                        |
-| [`ansible.cfg`](./playbooks/ansible.cfg)                    | Конфигурация Ansible                          |
+| [`netbox_data.json`](./netbox_data.json)               | Результат экспорта NetBox                     |
+| [`inventory.ini`](./inventory.ini)                  | Инвентаризация Ansible                        |
+| [`ansible.cfg`](./ansible.cfg)                    | Конфигурация Ansible                          |
 
 ---
 
