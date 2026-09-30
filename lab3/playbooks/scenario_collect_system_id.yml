@@ -1,0 +1,72 @@
+---
+- name: Collect CHR system-id and save to NetBox
+  hosts: routers
+  gather_facts: false
+
+  vars:
+    netbox_url: "http://10.129.0.22:8000"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+
+  tasks:
+
+    - name: Get RouterOS license information
+      community.routeros.command:
+        commands:
+          - /system license print
+      register: license_info
+
+    - name: Show license information
+      ansible.builtin.debug:
+        var: license_info.stdout_lines
+
+    - name: Extract RouterOS system-id
+      ansible.builtin.set_fact:
+        routeros_system_id: >-
+          {{
+            license_info.stdout_lines[0][0]
+            | split(':')
+            | last
+            | trim
+          }}
+
+    - name: Verify system-id was found
+      ansible.builtin.assert:
+        that:
+          - routeros_system_id | length > 0
+        fail_msg: "RouterOS system-id was not found in license output"
+
+    - name: Show collected system-id
+      ansible.builtin.debug:
+        msg:
+          device: "{{ inventory_hostname }}"
+          system_id: "{{ routeros_system_id }}"
+
+    - name: Update system-id in NetBox
+      ansible.builtin.shell: |
+        python3 - <<'PY'
+        import pynetbox
+
+        nb = pynetbox.api(
+            "{{ netbox_url }}",
+            token="{{ netbox_token }}"
+        )
+
+        devices = list(
+            nb.dcim.devices.filter(name="{{ inventory_hostname }}")
+        )
+
+        if not devices:
+            raise SystemExit(
+                "Device {{ inventory_hostname }} not found in NetBox"
+            )
+
+        device = devices[0]
+
+        device.custom_fields["routeros_system_id"] = "{{ routeros_system_id }}"
+        device.save()
+
+        print("Updated:", device.name)
+        PY
+      delegate_to: localhost
+      changed_when: true
+      no_log: true
