@@ -1,0 +1,167 @@
+---
+- name: Create NetBox custom fields
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    netbox_url: "http://10.129.0.22:8000"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+
+  tasks:
+
+    - name: Create RouterOS version field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "routeros_version"
+          label: "RouterOS version"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create architecture field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "architecture"
+          label: "Architecture"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create CPU field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "cpu"
+          label: "CPU"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create CPU count field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "cpu_count"
+          label: "CPU count"
+          type: "integer"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create CPU frequency field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "cpu_frequency_mhz"
+          label: "CPU frequency MHz"
+          type: "integer"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create total memory field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "total_memory_mb"
+          label: "Total memory MB"
+          type: "integer"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create free memory field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "free_memory_mb"
+          label: "Free memory MB"
+          type: "integer"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create total disk field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "total_disk_mb"
+          label: "Total disk MB"
+          type: "integer"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create free disk field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "free_disk_mb"
+          label: "Free disk MB"
+          type: "integer"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create board name field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "board_name"
+          label: "Board name"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create license level field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "license_level"
+          label: "License level"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create RouterOS system ID field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "routeros_system_id"
+          label: "RouterOS system ID"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
+
+    - name: Create ether1 MAC field
+      netbox.netbox.netbox_custom_field:
+        netbox_url: "{{ netbox_url }}"
+        netbox_token: "{{ netbox_token }}"
+        data:
+          name: "ether1_mac"
+          label: "ether1 MAC"
+          type: "text"
+          object_types:
+            - "dcim.device"
+        state: present
