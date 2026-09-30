@@ -560,14 +560,14 @@ lab2/
 | Файл                             | Назначение                                    |
 | -------------------------------- | --------------------------------------------- |
 | [`netbox_base.yml`](./playbooks/netbox_base.yml)                | Создание базовой структуры NetBox             |
-| `netbox_custom_fields.yml`       | Создание custom fields                        |
-| `collect_chr_info.yml`           | Сбор информации с CHR и запись в NetBox       |
-| `export_netbox.yml`              | Экспорт данных NetBox в JSON                  |
-| `scenario_netbox_to_chr.yml`     | Получение данных из NetBox и применение к CHR |
-| `scenario_collect_system_id.yml` | Сбор system-id с CHR и запись в NetBox        |
-| `netbox_data.json`               | Результат экспорта NetBox                     |
-| `inventory.ini`                  | Инвентаризация Ansible                        |
-| `ansible.cfg`                    | Конфигурация Ansible                          |
+| [`netbox_custom_fields.yml`](./playbooks/netbox_custom_fields.yml)       | Создание custom fields                        |
+| [`collect_chr_info.yml`](./playbooks/collect_chr_info.yml)           | Сбор информации с CHR и запись в NetBox       |
+| [`export_netbox.yml`](./playbooks/export_netbox.yml)              | Экспорт данных NetBox в JSON                  |
+| [`scenario_netbox_to_chr.yml`](./playbooks/scenario_netbox_to_chr.yml)     | Получение данных из NetBox и применение к CHR |
+| [`scenario_collect_system_id.yml`](./playbooks/scenario_collect_system_id.yml) | Сбор system-id с CHR и запись в NetBox        |
+| [`netbox_data.json`](./playbooks/netbox_data.json)               | Результат экспорта NetBox                     |
+| [`inventory.ini`](./playbooks/inventory.ini)                  | Инвентаризация Ansible                        |
+| [`ansible.cfg`](./playbooks/ansible.cfg)                    | Конфигурация Ansible                          |
 
 ---
 
